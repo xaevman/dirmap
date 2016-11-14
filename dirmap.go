@@ -42,8 +42,12 @@ func GetChanges(mapPath, dbPath string) ([]string, error) {
             // new
             changeList = append(changeList, sPath)
             prevMap[sPath] = &FileData{info.Size(), info.ModTime()}
-        } else if prevInfo.Size != info.Size() || prevInfo.ModTime != info.ModTime() {
-            // changed
+        } else if prevInfo.Size != info.Size() {
+            // changed size
+            changeList = append(changeList, sPath)
+            prevMap[sPath] = &FileData{info.Size(), info.ModTime()}
+        } else if prevInfo.ModTime != info.ModTime() {
+            // changed mod time
             changeList = append(changeList, sPath)
             prevMap[sPath] = &FileData{info.Size(), info.ModTime()}
         }
