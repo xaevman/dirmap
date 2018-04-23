@@ -7,6 +7,8 @@ import (
     "path/filepath"
     "strings"
     "time"
+
+    "github.com/gobwas/glob"
 )
 
 const (
@@ -19,6 +21,12 @@ type FileData struct {
 }
 
 func GetChanges(mapPath, dbPath string) ([]string, error) {
+    return GetChangesFilter(mapPath, dbPath, "*")
+}
+
+func GetChangesFilter(mapPath, dbPath, globStr string) ([]string, error) {
+    g := glob.MustCompile(globStr)
+
     prevMap, err := loadDb(dbPath)
     if err != nil {
         return nil, err
@@ -36,6 +44,10 @@ func GetChanges(mapPath, dbPath string) ([]string, error) {
         }
 
         sPath := strings.Replace(path, mapPath, "", -1)
+
+        if !g.Match(sPath) {
+            return nil
+        }
 
         prevInfo, ok := prevMap[sPath]
         if !ok {
